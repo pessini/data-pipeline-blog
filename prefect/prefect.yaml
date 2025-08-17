@@ -1,0 +1,6 @@
+name: prefect-pipelines
+# prefect-version: 3.4.1
+
+# Optional: tells Prefect where to look for deployments
+# deployments:
+#   - path: lottery/deployment.yaml

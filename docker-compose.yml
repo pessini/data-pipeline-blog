@@ -1,0 +1,120 @@
+name: lottery-pipeline-project
+volumes:
+  lottery_pipeline_minio_volume:
+    name: lottery_pipeline_minio_volume
+  lottery_pipeline_prefect_postgres_volume:
+    name: lottery_pipeline_prefect_postgres_volume
+
+networks:
+  data_pipeline_net:
+    driver: bridge
+    name: data_pipeline_net
+    internal: false
+services:
+
+  # MinIO object storage
+  lottery-pipeline-minio:
+    image: quay.io/minio/minio:latest
+    container_name: lottery-pipeline-minio
+    command: server /data --console-address ":9001"
+    restart: always
+    ports:
+      - 17110:9000  # MinIO API
+      - 17111:9001  # MinIO Console
+    networks:
+      - data_pipeline_net
+    volumes:
+      - lottery_pipeline_minio_volume:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+  
+  # Manually create a bucket for lottery
+  lottery-pipeline-minio-init:
+    image: minio/mc:latest
+    container_name: lottery-pipeline-minio-init
+    depends_on:
+      - lottery-pipeline-minio
+    entrypoint: >
+      sh -c "
+        sleep 5 &&
+        /usr/bin/mc alias set myminio http://lottery-pipeline-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+        /usr/bin/mc mb --region=${MINIO_REGION} myminio/${MINIO_BUCKETS} || true
+      "
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKETS: ${MINIO_BUCKETS}
+      MINIO_REGION: ${MINIO_REGION}
+    networks:
+      - data_pipeline_net
+  
+  # Prefect server
+  lottery-pipeline-prefect-server:
+    image: prefecthq/prefect:3-latest
+    container_name: lottery-pipeline-prefect-server
+    restart: on-failure
+    # command: prefect server start --host 0.0.0.0 --port 17112
+    command: >
+      bash -c "
+        prefect config set PREFECT_SERVER_API_HOST=0.0.0.0 &&
+        prefect config set PREFECT_SERVER_API_PORT=17112 &&
+        prefect server start
+      "
+    environment:
+      PREFECT_API_DATABASE_CONNECTION_URL: ${PREFECT_API_DATABASE_CONNECTION_URL}
+    ports:
+      - 17112:17112  # Prefect UI
+    networks:
+      - data_pipeline_net
+
+  # PostgreSQL database for Prefect
+  lottery-pipeline-prefect-postgres:
+    image: postgres:17
+    container_name: lottery-pipeline-prefect-postgres
+    restart: always
+    volumes:
+      - lottery_pipeline_prefect_postgres_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - data_pipeline_net
+
+  # Prefect worker
+  lottery-pipeline-prefect-worker:
+    image: prefecthq/prefect:3-latest
+    container_name: lottery-pipeline-prefect-worker
+    restart: always
+    command: >
+      bash -c "pip install 'prefect-docker>=${PREFECT_DOCKER_VERSION}' &&
+               prefect worker start --pool docker"
+    environment:
+      PREFECT_API_URL: ${PREFECT_API_URL}
+      PREFECT_DOCKER_VERSION: ${PREFECT_DOCKER_VERSION}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - data_pipeline_net
+
+  # Streamlit dashboard
+  lottery-pipeline-streamlit:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: lottery-pipeline-streamlit
+    restart: unless-stopped
+    ports:
+      - 17113:8501  # Streamlit dashboard
+    environment:
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      S3_REGION: ${S3_REGION}
+      DUCKDB_FILE_PATH: ${DUCKDB_FILE_PATH}
+    networks:
+      - data_pipeline_net
+    depends_on:
+      - lottery-pipeline-minio

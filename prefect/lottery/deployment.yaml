@@ -1,0 +1,50 @@
+build:
+  - prefect_docker.deployments.steps.build_docker_image:
+      id: build-image
+      requires: prefect-docker>=0.6.4
+      image_name: lottery-pipeline-image
+      tag: latest
+      dockerfile: Dockerfile
+      path: ./lottery
+      rm: true # remove intermediate containers
+
+deployments:
+  - name: extract-lottery-data
+    version: "0.1"
+    description: "Fetch lottery results and store in Minio"
+    entrypoint: lottery/fetch_games_results.py:fetch_lottery_results
+    schedule:
+      - cron: "0 2 * * *" # every day at 2am
+        slug: "daily-schedule"
+        timezone: "America/Sao_Paulo"
+        active: true
+    parameters: 
+      draw_number: null
+    work_pool:
+      name: docker
+      job_variables:
+        image: "{{ build-image.image }}"
+    tags:
+      - lottery
+  
+  - name: process-lottery-results
+    version: "0.1"
+    description: "Compile lottery results into DuckDB database and store in Minio"
+    entrypoint: lottery/compile_lottery_results.py:compile_lottery_results
+    work_pool:
+      name: docker
+      job_variables:
+        image: "{{ build-image.image }}"
+    tags:
+      - lottery
+
+  - name: reset-tags
+    version: "0.1"
+    description: "Flow to reset processed=true tags to processed=false."
+    entrypoint: lottery/reset_processed_tags.py:reset_processed_tags
+    work_pool:
+      name: docker
+      job_variables:
+        image: "{{ build-image.image }}"
+    tags:
+      - lottery
