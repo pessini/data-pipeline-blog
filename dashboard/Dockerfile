@@ -17,4 +17,4 @@ RUN uv pip install --system -r requirements.txt
 COPY app/ ./app/
 
 # Run Streamlit
-ENTRYPOINT ["streamlit", "run", "app/main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "app/main.py", "--server.port=17113", "--server.address=0.0.0.0"]
