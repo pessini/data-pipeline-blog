@@ -85,10 +85,12 @@ services:
     restart: always
     command: >
       bash -c "pip install 'prefect-docker>=${PREFECT_DOCKER_VERSION}' &&
-               prefect worker start --pool docker"
+               PREFECT_PROFILE=${PREFECT_PROFILE} prefect worker start --pool docker &&
+               prefect config view"
     environment:
       PREFECT_API_URL: ${PREFECT_API_URL}
       PREFECT_DOCKER_VERSION: ${PREFECT_DOCKER_VERSION}
+      PREFECT_PROFILE: ${PREFECT_PROFILE}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:

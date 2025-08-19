@@ -1,0 +1,5 @@
+__pycache__
+.env
+.venv
+pip-log.txt
+.DS_Store

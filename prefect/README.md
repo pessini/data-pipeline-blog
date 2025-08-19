@@ -30,5 +30,5 @@ This will open a link in your browser to the Prefect UI, where you can fill in t
 
 ### Prefect Deploy
 ```sh
-prefect deploy --prefect-file lottery/deployment.yaml  
+PREFECT_PROFILE=lottery-project prefect deploy --prefect-file lottery/deployment.yaml  
 ```
