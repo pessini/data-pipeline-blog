@@ -44,7 +44,7 @@ deployments:
   - name: process-lottery-results
     version: "0.1"
     description: "Compile lottery results into DuckDB database and store in Minio"
-    entrypoint: compile_lottery_results.py:compile_lottery_results
+    entrypoint: prefect/compile_lottery_results.py:compile_lottery_results
     work_pool:
       name: docker
       job_variables:
@@ -56,7 +56,7 @@ deployments:
   - name: reset-tags
     version: "0.1"
     description: "Flow to reset processed=true tags to processed=false."
-    entrypoint: reset_processed_tags.py:reset_processed_tags
+    entrypoint: prefect/reset_processed_tags.py:reset_processed_tags
     work_pool:
       name: docker
       job_variables:
