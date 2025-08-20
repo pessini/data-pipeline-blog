@@ -4,19 +4,28 @@ build:
       requires: prefect-docker>=0.6.4
       image_name: lottery-pipeline-image
       tag: latest
-      dockerfile: Dockerfile
-      path: . # Build context is current directory (prefect/)
+      dockerfile: prefect/Dockerfile
       rm: true # remove intermediate containers
 
+# known Prefect issue:
+# prefect.deployments.steps.set_working_directory sometimes fails 
+# with absolute paths (like /opt/prefect/lottery) even though the 
+# directory exists in the built image.
+# See https://github.com/PrefectHQ/prefect/issues/18182 for details.
+
+# With this setup with worker as docker pool, prefer remote repo
 pull:
-  - prefect.deployments.steps.set_working_directory:
-      directory: /opt/prefect/lottery
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/pessini/data-pipeline-blog.git
+      # You ca use Prefect Blocks to load credentials in runtime
+      # Ex: Block type github credentials with name gh-credentials
+      # credentials: "{{ prefect.blocks.github-credentials.gh-credentials }}"
 
 deployments:
   - name: extract-lottery-data
     version: "0.2"
     description: "Fetch lottery results and store in Minio"
-    entrypoint: fetch_games_results.py:fetch_lottery_results
+    entrypoint: prefect/fetch_games_results.py:fetch_lottery_results
     schedule:
       - cron: "0 2 * * *" # every day at 2am
         slug: "daily-schedule"
@@ -28,6 +37,7 @@ deployments:
       name: docker
       job_variables:
         image: "{{ build-image.image }}"
+        network: data_pipeline_net
     tags:
       - lottery
   
@@ -39,6 +49,7 @@ deployments:
       name: docker
       job_variables:
         image: "{{ build-image.image }}"
+        network: data_pipeline_net
     tags:
       - lottery
 
@@ -50,5 +61,6 @@ deployments:
       name: docker
       job_variables:
         image: "{{ build-image.image }}"
+        network: data_pipeline_net
     tags:
       - lottery
