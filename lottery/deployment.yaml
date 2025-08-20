@@ -37,7 +37,6 @@ deployments:
       name: docker
       job_variables:
         image: "{{ build-image.image }}"
-        network: data_pipeline_net
     tags:
       - lottery
   
@@ -49,7 +48,6 @@ deployments:
       name: docker
       job_variables:
         image: "{{ build-image.image }}"
-        network: data_pipeline_net
     tags:
       - lottery
 
@@ -61,6 +59,5 @@ deployments:
       name: docker
       job_variables:
         image: "{{ build-image.image }}"
-        network: data_pipeline_net
     tags:
       - lottery
