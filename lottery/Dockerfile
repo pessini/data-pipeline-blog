@@ -8,10 +8,10 @@ RUN apt-get update && \
 RUN pip install uv
 
 # Set working directory
-WORKDIR /opt/prefect/prefect
+WORKDIR /opt/prefect/lottery
 
 # Copy requirements file
-COPY prefect/requirements.txt .
+COPY lottery/requirements.txt .
 
 # Install dependencies using uv pip
 RUN uv pip install -r requirements.txt
