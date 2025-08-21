@@ -4,7 +4,7 @@ build:
       requires: prefect-docker>=0.6.4
       image_name: lottery-pipeline-image
       tag: latest
-      dockerfile: lottery/Dockerfile
+      dockerfile: auto
       rm: true # remove intermediate containers
 
 # known Prefect issue:
