@@ -9,7 +9,6 @@ networks:
   data_pipeline_net:
     driver: bridge
     name: data_pipeline_net
-    internal: false
 services:
 
   # MinIO object storage
@@ -32,7 +31,7 @@ services:
   # Manually create a bucket for lottery
   lottery-pipeline-minio-init:
     build:
-      context: .
+      context: ..
       dockerfile: minio/minio-init.Dockerfile
     container_name: lottery-pipeline-minio-init
     depends_on:
@@ -88,7 +87,7 @@ services:
               prefect profile create ${PREFECT_PROFILE} || true &&
               prefect profile use ${PREFECT_PROFILE} &&
               prefect config set PREFECT_API_URL=${PREFECT_API_URL} &&
-              PREFECT_PROFILE=${PREFECT_PROFILE} prefect worker start --pool docker"
+              prefect worker start --pool docker"
     environment:
       PREFECT_API_URL: ${PREFECT_API_URL}
       PREFECT_DOCKER_VERSION: ${PREFECT_DOCKER_VERSION}
@@ -101,7 +100,7 @@ services:
   # Streamlit dashboard
   lottery-pipeline-streamlit:
     build:
-      context: ./dashboard
+      context: ../dashboard
       dockerfile: Dockerfile
     container_name: lottery-pipeline-streamlit
     restart: unless-stopped
