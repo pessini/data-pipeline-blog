@@ -16,11 +16,14 @@ build:
 # With this setup with worker as docker pool, prefer remote repo
 pull:
   - prefect.deployments.steps.git_clone:
+      id: clone
       repository: https://github.com/pessini/data-pipeline-blog.git
       # You ca use Prefect Blocks to load credentials in runtime
       # Ex: Block type github credentials with name gh-credentials
       # credentials: "{{ prefect.blocks.github-credentials.gh-credentials }}"
-
+  - prefect.deployments.steps.pip_install_requirements:
+      directory: "{{ clone.directory }}"
+      requirements_file: "lottery/requirements.txt"
 deployments:
   - name: extract-lottery-data
     version: "0.2"
