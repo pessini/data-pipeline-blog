@@ -18,26 +18,26 @@ The pipeline processes lottery results from games like **Quina** and **Mega-Sena
 3. **Transform and Query with DuckDB** – Normalize fields and create queryable tables.  
 4. **Visualize with Streamlit** – Interactive dashboard to explore results and statistics.
 
-## Tech stack
+## Tech Stack
 
-- Prefect  -  Keeps our workflows reliable with retries, scheduling, and orchestration.
-- MinIO  -  Acts as our local S3-compatible data lake, great for raw JSON storage.
-- DuckDB  -  Handles transformation and querying, optimized for columnar analytics.
-- Streamlit  -  Turns data into a user-friendly dashboard.
-- Docker  -  Ensures everything runs reproducibly, isolated but connected.
-
-All services run in isolated Docker containers but share a custom network for secure communication.
+- **Prefect** – Orchestrates workflows with retries, scheduling, and monitoring.  
+- **MinIO** – Local S3-compatible data lake for storing raw JSON data.  
+- **DuckDB** – Columnar database optimized for fast querying and transformations.  
+- **Streamlit** – Interactive, user-friendly dashboard.  
+- **Docker** – Ensures reproducibility with isolated, connected containers.
 
 ---
 
 ## Quick Start
+
+> ⚠️ **Note:** Please fork this repository before using it, so you can safely modify environment variables and experiment without affecting the original project.
 
 All the services are set up in the `/docker` folder. To get the pipeline running:
 
 1. Copy the environment example:
 ```bash
 cp docker/.env.example docker/.env
-````
+```
 2. Edit .env with your credentials if needed.
 3. Start everything with
 ```bash
