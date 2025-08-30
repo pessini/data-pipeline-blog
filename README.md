@@ -1,35 +1,58 @@
-# data-pipeline-blog
-Source repo for the blog post series End-to-End Data Pipelines: A Hands-On Guide for Data Scientists 
+# 🎲 Lottery Pipeline Project
 
+[![Python](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker)](https://www.docker.com/)
+[![Prefect](https://img.shields.io/badge/Prefect-3-lavender)](https://www.prefect.io/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-orange)](https://streamlit.io/)
 
-## Prefect Configuration
+This repository contains a **production-inspired end-to-end data pipeline** for official Brazilian lottery results. The project shows how to collect, store, transform, and visualize real-world data using modern Python tools and Docker.
 
-```sh
-prefect profile create lottery-project
-prefect profile use lottery-project
-prefect config set PREFECT_API_URL=http://localhost:17112/api
+---
+
+## Project Overview
+
+The pipeline processes lottery results from games like **Quina** and **Mega-Sena** through these steps:
+
+1. **Fetch Data from API** – Pull historical lottery results as structured JSON.  
+2. **Store Raw Data in MinIO** – Save each draw in an S3-compatible bucket.  
+3. **Transform and Query with DuckDB** – Normalize fields and create queryable tables.  
+4. **Visualize with Streamlit** – Interactive dashboard to explore results and statistics.
+
+## Tech stack
+
+- Prefect  -  Keeps our workflows reliable with retries, scheduling, and orchestration.
+- MinIO  -  Acts as our local S3-compatible data lake, great for raw JSON storage.
+- DuckDB  -  Handles transformation and querying, optimized for columnar analytics.
+- Streamlit  -  Turns data into a user-friendly dashboard.
+- Docker  -  Ensures everything runs reproducibly, isolated but connected.
+
+All services run in isolated Docker containers but share a custom network for secure communication.
+
+---
+
+## Quick Start
+
+All the services are set up in the `/docker` folder. To get the pipeline running:
+
+1. Copy the environment example:
+```bash
+cp docker/.env.example docker/.env
+````
+2. Edit .env with your credentials if needed.
+3. Start everything with
+```bash
+docker compose -f docker/docker-compose.yaml up -d
 ```
+4. Access services:
+    - MinIO API: http://localhost:17110
+    - MinIO Console: http://localhost:17111
+    - Prefect UI: http://localhost:17112
+    - Streamlit Dashboard: http://localhost:17113
 
-### Prefect Variables
-Create a variable using CLI
-```sh
-prefect variable set lottery_games '["lotofacil", "lotomania", "megasena", "quina", "loteca", "duplasena", "diadesorte", "supersete"]'
-```
+## Series Articles
 
-### Prefect Blocks
-```sh
-prefect block create minio-credentials
-```
-This will open a link in your browser to the Prefect UI, where you can fill in the details:
-- Block Name: minio-credentials
-- Endpoint URL: https://host.docker.internal:9000
-- Minio Root User: minioadmin
-- Minio Root Password: minioadmin_password_change_me
+For a detailed walkthrough, check out the three-part series:
 
-### Prefect Automation
-
-
-### Prefect Deploy
-```sh
-PREFECT_PROFILE=lottery-project prefect deploy --prefect-file lottery/deployment.yaml
-```
+- Part 1 – From API to Docker Compose Setup
+- Part 2 – Writing Prefect Flows to Fetch, Store, and Transform Data
+- Part 3 – Building and Deploying the Streamlit Dashboard
