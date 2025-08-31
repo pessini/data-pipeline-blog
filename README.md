@@ -7,8 +7,6 @@
 
 This repository contains a **production-inspired end-to-end data pipeline** for official Brazilian lottery results. The project shows how to collect, store, transform, and visualize real-world data using modern Python tools and Docker.
 
----
-
 ## Project Overview
 
 The pipeline processes lottery results from games like **Quina** and **Mega-Sena** through these steps:
@@ -25,8 +23,6 @@ The pipeline processes lottery results from games like **Quina** and **Mega-Sena
 - **DuckDB** – Columnar database optimized for fast querying and transformations.  
 - **Streamlit** – Interactive, user-friendly dashboard.  
 - **Docker** – Ensures reproducibility with isolated, connected containers.
-
----
 
 ## Quick Start
 
