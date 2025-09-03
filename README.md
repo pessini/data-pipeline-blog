@@ -49,6 +49,6 @@ docker compose -f docker/docker-compose.yaml up -d
 
 For a detailed walkthrough, check out the three-part series:
 
-- Part 1 – From API to Docker Compose Setup
-- Part 2 – Writing Prefect Flows to Fetch, Store, and Transform Data
-- Part 3 – Building and Deploying the Streamlit Dashboard
+- [Part 1 – From API to Docker Compose Setup](https://medium.com/@pessini/building-end-to-end-data-pipelines-a-hands-on-guide-for-data-scientists-part-1-adcdc7bce22a)
+- [Part 2 – Writing Prefect Flows to Fetch, Store, and Transform Data](https://medium.com/@pessini/building-end-to-end-data-pipelines-a-hands-on-guide-for-data-scientists-part-2-60b00bbce6e8)
+- [Part 3 – Building and Deploying the Streamlit Dashboard](https://medium.com/@pessini/building-end-to-end-data-pipelines-a-hands-on-guide-for-data-scientists-part-3-c545b9159f1f)
