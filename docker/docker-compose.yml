@@ -83,7 +83,7 @@ services:
     container_name: lottery-pipeline-prefect-worker
     restart: always
     command: >
-      bash -c "pip install 'prefect-docker>=${PREFECT_DOCKER_VERSION}' &&
+      bash -c "pip install 'prefect[docker]' &&
               prefect profile create ${PREFECT_PROFILE} || true &&
               prefect profile use ${PREFECT_PROFILE} &&
               prefect config set PREFECT_API_URL=${PREFECT_API_URL} &&
